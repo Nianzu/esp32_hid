@@ -8,8 +8,6 @@ mod control;
 #[cfg(feature = "smartled")]
 mod esp_hal_smartled;
 mod hid_report_writer;
-#[cfg(feature = "ota")]
-mod ota;
 mod running_state;
 mod synergy_hid;
 mod usb_actuator;
@@ -20,8 +18,6 @@ pub use barrier_client::*;
 pub use clipboard::{button_task, set_clipboard};
 pub use config::{AppConfig, ConfigStore};
 pub use hid_report_writer::{HidReport, send_hid_report, start_hid_task};
-#[cfg(feature = "ota")]
-pub use ota::OTA_IN_PROGRESS;
 pub use running_state::{RunningState, get_running_state};
 pub use synergy_hid::{ReportType, SynergyHid, ASCII_2_HID, KeyboardReport};
 pub use usb_actuator::UsbActuator;
