@@ -25,7 +25,7 @@ pub use indicator::*;
 #[cfg(feature = "ota")]
 pub use ota::OTA_IN_PROGRESS;
 pub use running_state::{RunningState, get_running_state};
-pub use synergy_hid::{ReportType, SynergyHid};
+pub use synergy_hid::{ReportType, SynergyHid, ASCII_2_HID, KeyboardReport};
 pub use usb_actuator::UsbActuator;
 
 #[macro_export]

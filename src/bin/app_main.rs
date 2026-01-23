@@ -2,7 +2,6 @@
 #![no_main]
 
 extern crate alloc;
-
 use embassy_executor::Spawner;
 use embassy_net::StackResources;
 use embassy_time::{Duration, Timer};
@@ -23,7 +22,7 @@ use esparrier::constants::*;
 
 use esparrier::{
     AppConfig, IndicatorStatus, UsbActuator, mk_static, set_indicator_status, start_barrier_client,
-    start_hid_task, start_indicator_task,
+    start_hid_task, start_indicator_task, HidReport, send_hid_report, ASCII_2_HID, KeyboardReport,
 };
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
@@ -189,6 +188,15 @@ async fn main(spawner: Spawner) {
 
         stack
     };
+
+    info!("Ready to send keypresses");
+    let byte = 0x41;
+    let [k, m] = ASCII_2_HID[byte as usize];
+    let mut report = KeyboardReport::default();
+   loop {
+       send_hid_report(HidReport::keyboard(report.press(k))).await;
+       Timer::after(Duration::from_millis(1000)).await;
+   }
 
     info!("Waiting for net link up...");
     loop {
