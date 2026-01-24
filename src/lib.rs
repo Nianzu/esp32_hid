@@ -1,11 +1,9 @@
 #![no_std]
 
-mod clipboard;
 mod hid_report_writer;
 mod synergy_hid;
 
 pub mod constants;
-pub use clipboard::{button_task, set_clipboard};
 pub use hid_report_writer::{HidReport, send_hid_report, start_hid_task};
 pub use synergy_hid::{ReportType, SynergyHid, ASCII_2_HID, KeyboardReport};
 
