@@ -21,7 +21,7 @@ use esp_hal::{
 };
 use log::{debug, info, warn};
 
-use crate::{AppConfig, SynergyHid, constants::DEVICE_INTERFACE_GUIDS, mk_static};
+use crate::{SynergyHid, constants::DEVICE_INTERFACE_GUIDS, mk_static};
 
 type ReportWriter<'a, const N: usize> = HidWriter<'a, Driver<'a>, N>;
 
@@ -66,10 +66,9 @@ struct UsbHidReportWriter<'a> {
 
 impl<'a> UsbHidReportWriter<'a> {
     pub fn new(hid_report_writer: ReportWriter<'a, 9>) -> Self {
-        let config = AppConfig::get();
         Self {
             hid_report_writer,
-            polling_interval: config.get_polling_interval(),
+            polling_interval:  5,
         }
     }
 }
@@ -178,14 +177,13 @@ pub async fn send_hid_report(report: HidReport) {
 }
 
 pub fn start_hid_task(spawner: Spawner, usb: Usb<'static>) {
-    let app_config = AppConfig::get();
 
     let ep_out_buffer = mk_static!([u8; 1024], [0u8; 1024]);
     let config = esp_hal::otg_fs::asynch::Config::default();
     let driver = esp_hal::otg_fs::asynch::Driver::new(usb, ep_out_buffer, config);
-    let mut config = embassy_usb::Config::new(app_config.vid, app_config.pid);
-    config.manufacturer = Some(&app_config.manufacturer);
-    config.product = Some(&app_config.product);
+    let mut config = embassy_usb::Config::new(0x0d0a, 0xc0de);
+    config.manufacturer = Some(&"0d0a.com");
+    config.product = Some(&"Esparrier KVM");
     // TODO: MacOs doesn't like these settings, why? Not sure about the last 2 but the 1st one is definitely the issue.
     // config.device_class = 0x03; // HID
     // config.device_sub_class = 0x01; // Boot Interface Subclass
@@ -194,7 +192,7 @@ pub fn start_hid_task(spawner: Spawner, usb: Usb<'static>) {
     config.device_sub_class = 0x02; // Common Class
     config.device_protocol = 0x01; // Interface Association Descriptor
     config.composite_with_iads = true;
-    config.serial_number = Some(&app_config.serial_number);
+    config.serial_number = Some(&"88888888");
     config.max_power = 100;
     config.max_packet_size_0 = 64;
 
@@ -227,7 +225,7 @@ pub fn start_hid_task(spawner: Spawner, usb: Usb<'static>) {
     let config = embassy_usb::class::hid::Config {
         report_descriptor: SynergyHid::get_report_descriptor().1,
         request_handler: None,
-        poll_ms: app_config.get_polling_interval(),
+        poll_ms:5, 
         max_packet_size: 64,
     };
 
@@ -236,25 +234,6 @@ pub fn start_hid_task(spawner: Spawner, usb: Usb<'static>) {
         hid_dev_state,
         config,
     );
-
-    // Configure WebUSB support (optional, based on config)
-    // If webusb_url is set, browsers will show a notification when the device is plugged in
-    let webusb_landing_url: Option<WebUsbUrl<'static>> =
-        app_config.webusb_url.as_ref().map(|url| {
-            let url_str = mk_static!(heapless::String<128>, url.clone());
-            WebUsbUrl::new(url_str.as_str())
-        });
-    let webusb_config = mk_static!(
-        WebUsbConfig<'static>,
-        WebUsbConfig {
-            max_packet_size: 64,
-            landing_url: webusb_landing_url,
-            vendor_code: 0x01, // Vendor code for WebUSB requests
-        }
-    );
-    let webusb_state = mk_static!(WebUsbState<'static>, WebUsbState::new());
-    embassy_usb::class::web_usb::WebUsb::configure(&mut builder, webusb_state, webusb_config);
-
     // Add a vendor-specific function (class 0xFF), and corresponding interface,
     // that uses our custom handler.
     let mut function = builder.function(0xFF, 0x0D, 0x0A);

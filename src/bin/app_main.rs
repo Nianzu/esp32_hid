@@ -19,7 +19,7 @@ use log::{debug, error, info, warn};
 use esparrier::constants::*;
 
 use esparrier::{
-    AppConfig, mk_static, 
+    mk_static, 
     start_hid_task, HidReport, send_hid_report, ASCII_2_HID, KeyboardReport,
 };
 
@@ -45,10 +45,6 @@ async fn main(spawner: Spawner) {
     // let systimer = SystemTimer::new(peripherals.SYSTIMER);
     let timg0 = TimerGroup::new(peripherals.TIMG0);
     esp_rtos::start(timg0.timer0);
-
-    // Load the configuration
-    AppConfig::init(peripherals.FLASH).await;
-    println!("Config: {:?}", AppConfig::get());
 
     // Setup watchdog on TIMG1, which is by default disabled by the bootloader
     let wdt1 = mk_static!(Wdt<TIMG1>, TimerGroup::new(peripherals.TIMG1).wdt);
