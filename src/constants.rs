@@ -45,11 +45,7 @@ const GRAPHICS_INDICATOR_FLAG: u8 = if cfg!(feature = "graphics") {
     0b0000_0000
 };
 
-const CLIPBOARD_FLAG: u8 = if cfg!(feature = "clipboard") {
-    0b1000_0000
-} else {
-    0b0000_0000
-};
+const CLIPBOARD_FLAG: u8 = 0b1000_0000;
 
 const OTA_FLAG: u8 = if cfg!(feature = "ota") {
     0b0100_0000
@@ -98,13 +94,12 @@ cfg_if::cfg_if! {
         pub const PASTE_BUTTON_PIN: u8 = 41;
     } else if #[cfg(feature = "m5atoms3-lite")] {
         pub const PASTE_BUTTON_PIN: u8 = 41;
-    } else if #[cfg(feature = "clipboard")] {
+    } else {
         #[env_item]
         pub const PASTE_BUTTON_PIN: u8 = 0;
     }
 }
 
-#[cfg(feature = "clipboard")]
 #[env_item]
 pub const MAX_CLIPBOARD_SIZE: usize = 1024;
 

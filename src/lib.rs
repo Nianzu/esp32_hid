@@ -3,7 +3,6 @@
 #[cfg(feature = "clipboard")]
 mod clipboard;
 mod config;
-mod control;
 #[cfg(feature = "smartled")]
 mod esp_hal_smartled;
 mod hid_report_writer;
