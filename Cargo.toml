@@ -98,8 +98,8 @@ const-str = "0.7.0"
 embassy-sync = "0.7.2"
 smart-leds-trait = { version = "0.3.2", optional = true }
 smart-leds = { version = "0.4.0", optional = true }
-async-debounce = { version = "0.3.0", optional = true }
-embedded-hal-async = { version = "1.0.0", optional = true }
+async-debounce = { version = "0.3.0", optional = false }
+embedded-hal-async = { version = "1.0.0", optional = false }
 
 embedded-hal-bus = { version = "0.3.0", features = ["async"], optional = true }
 embedded-graphics = { version = "0.8.1", optional = true }
@@ -113,7 +113,6 @@ embedded-hal-1 = { package = "embedded-hal", version = "1.0", optional = true }
 
 [features]
 default = ["usb"]
-clipboard = ["async-debounce", "embedded-hal-async"]
 usb = []
 ota = []
 indicator = []
@@ -132,9 +131,9 @@ ethernet = ["embassy-net-wiznet", "embedded-hal-1", "embedded-hal-bus"]
 
 # Features for the ESP32-S3 boards
 generic = ["wifi"]
-m5atoms3-lite = ["smartled", "clipboard", "wifi", "ota"]
-m5atoms3 = ["graphics", "clipboard", "wifi", "ota"]
-m5atoms3r = ["graphics", "clipboard", "wifi", "ota"]
+m5atoms3-lite = ["smartled", "wifi", "ota"]
+m5atoms3 = ["graphics", "wifi", "ota"]
+m5atoms3r = ["graphics", "wifi", "ota"]
 xiao-esp32s3 = ["led", "wifi", "ota"]
 devkitc-1_0 = ["smartled", "wifi", "ota"]
 devkitc-1_1 = ["smartled", "wifi", "ota"]

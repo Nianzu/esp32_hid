@@ -1,10 +1,8 @@
-#[cfg(feature = "clipboard")]
 mod ascii_2_hid;
 mod descriptors;
 mod hid;
 mod keycodes;
 
-#[cfg(feature = "clipboard")]
 pub use ascii_2_hid::ASCII_2_HID;
 use descriptors::COMPOSITE_REPORT_DESCRIPTOR;
 pub use hid::KeyboardReport;
