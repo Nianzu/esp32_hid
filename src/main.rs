@@ -16,7 +16,6 @@ use esp_rtos::main;
 use log::{info};
 
 mod keycodes;
-pub mod descriptors;
 use esparrier::{
     HidReport, mk_static, send_hid_report, start_hid_task,
 };
