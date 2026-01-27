@@ -1,11 +1,9 @@
 #![no_std]
 
 mod hid_report_writer;
-mod synergy_hid;
 
 pub mod constants;
 pub use hid_report_writer::{HidReport, send_hid_report, start_hid_task};
-pub use synergy_hid::{KeyboardReport, ReportType, SynergyHid};
 
 #[macro_export]
 macro_rules! mk_static {
