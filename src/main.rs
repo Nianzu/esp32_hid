@@ -13,9 +13,8 @@ use esp_hal::{
 };
 use esp_println::println;
 use esp_rtos::main;
-use log::{debug, error, info, warn};
+use log::{info};
 
-use esparrier::constants::*;
 mod keycodes;
 use esparrier::{
     HidReport, KeyboardReport, mk_static, send_hid_report, start_hid_task,
@@ -59,7 +58,6 @@ async fn main(spawner: Spawner) {
     start_hid_task(spawner, usb);
 
     info!("Ready to send keypresses");
-    let byte = 0x41;
     let mut report = KeyboardReport::default();
     loop {
         send_hid_report(HidReport::keyboard(report.press(keycodes::HID_KEY_A))).await;
