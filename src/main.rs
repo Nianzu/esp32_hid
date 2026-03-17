@@ -18,6 +18,7 @@ use esparrier::mk_static;
 
 mod keycodes;
 mod hid_report_writer;
+
 #[derive(Debug, Default)]
 pub struct KeyboardReport {
     modifier: u8,
@@ -119,7 +120,6 @@ esp_bootloader_esp_idf::esp_app_desc!();
 
 #[main]
 async fn main(spawner: Spawner) {
-    esp_println::logger::init_logger_from_env();
 
     println!(
         "Firmware version: {} {}",
@@ -129,14 +129,17 @@ async fn main(spawner: Spawner) {
 
     let peripherals = esp_hal::init(esp_hal::Config::default().with_cpu_clock(CpuClock::max()));
 
+    // Configure a global allocator
     esp_alloc::heap_allocator!(size: 160 * 1024);
 
     // Setup Embassy
-    // let systimer = SystemTimer::new(peripherals.SYSTIMER);
+    // (RTOS required for radio and async)
+    // https://docs.espressif.com/projects/rust/esp-rtos/0.1.0/esp32/esp_rtos/index.html
     let timg0 = TimerGroup::new(peripherals.TIMG0);
     esp_rtos::start(timg0.timer0);
 
     // Setup watchdog on TIMG1, which is by default disabled by the bootloader
+    // Watchdog resets system if not fed once per second
     let wdt1 = mk_static!(Wdt<TIMG1>, TimerGroup::new(peripherals.TIMG1).wdt);
     wdt1.set_timeout(MwdtStage::Stage0, esp_hal::time::Duration::from_secs(1));
     wdt1.set_stage_action(MwdtStage::Stage0, MwdtStageAction::ResetSystem);
@@ -147,6 +150,7 @@ async fn main(spawner: Spawner) {
     spawner.must_spawn(watchdog_task(wdt1));
 
     // Setup HID task
+    // Uses USB GPIOs
     let usb = Usb::new(peripherals.USB0, peripherals.GPIO20, peripherals.GPIO19);
     hid_report_writer::start_hid_task(spawner, usb);
 
@@ -158,6 +162,7 @@ async fn main(spawner: Spawner) {
     }
 }
 
+// Watchdog that gets fed every 500 ms
 #[embassy_executor::task]
 async fn watchdog_task(watchdog: &'static mut Wdt<TIMG1<'static>>) {
     loop {
