@@ -2,7 +2,7 @@
 
 A stripped down version of the HID implementation from https://github.com/windoze/esparrier, designed to be a drop-in library for making esp32 based keyboards in rust.
 
-```
+```bash
 cargo install espup --locked
 cargo install cargo-espflash --locked
 cargo install cargo-espmonitor
@@ -10,6 +10,31 @@ espup install
 echo 'source $HOME/export-esp.sh' >> ~/.bashrc
 source ~/.bashrc
 cargo build --example single_key
+```
+## Example
+See [examples/single_key.rs](examples/single_key.rs) for a full example implementation. 
+
+```rust
+#[main]
+async fn main(spawner: Spawner) {
+
+    // ... esp32 boilerplate omitted
+
+    let usb = Usb::new(peripherals.USB0, peripherals.GPIO20, peripherals.GPIO19);
+    let config = HidConfig::default();
+    let mut keyboard = Keyboard::new(spawner, usb, config);
+
+    let config = InputConfig::default().with_pull(Pull::Down);
+    let button = Input::new(peripherals.GPIO2, config);
+    loop {
+        if button.is_high() {
+            keyboard.press(keycodes::HID_KEY_C).await;
+        } else {
+            keyboard.release(keycodes::HID_KEY_C).await;
+        }
+        Timer::after(Duration::from_millis(5)).await;
+    }
+}
 ```
 
 ## Credits
