@@ -67,7 +67,8 @@ async fn main(spawner: Spawner) {
         } else {
             keyboard.release(keycodes::HID_KEY_C).await;
         }
-        //Timer::after(Duration::from_millis(1000)).await;
+        // Yield here is required. Without it, there is significant lag, presumably because the HID task doesn't get adequate runtime
+        Timer::after(Duration::from_millis(5)).await;
     }
 }
 
