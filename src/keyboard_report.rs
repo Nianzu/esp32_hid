@@ -59,12 +59,14 @@ impl KeyboardReport {
         self.send()
     }
 
+    #[allow(dead_code)]
     pub fn clear(&mut self) -> [u8; 8] {
         self.modifier = 0;
         self.keycode = [0; 6];
         self.send()
     }
 
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.modifier == 0 && self.keycode.iter().all(|&x| x == 0)
     }
