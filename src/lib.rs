@@ -14,5 +14,7 @@ macro_rules! mk_static {
     }};
 }
 
-pub mod hid_report_writer;
+pub(crate) mod hid_report_writer;
+pub mod keyboard;
+pub(crate) mod keyboard_report;
 pub mod keycodes;
